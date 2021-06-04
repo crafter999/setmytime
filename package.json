@@ -1,13 +1,14 @@
 {
   "name": "syncmytime",
-  "version": "0.2.3",
+  "version": "0.3.1",
   "description": "Synchronize system date using NTP public servers. (0 deps)",
-  "main": "main.js",
+  "main": "./src/main.js",
   "bin": {
-    "syncmytime": "./main.js"
+    "syncmytime": "./src/main.js"
   },
   "scripts": {
-    "publish": "cp README.md ./dist && cp ./package* ./dist && npm publish ./dist"
+    "prep": "rm -rf ./dist && tsc && cp README.md ./dist && cp ./package* ./dist && rm -rf ./node-gyp/build && cp ./node-gyp/* ./dist/node-gyp",
+    "install": "cd ./node-gyp && node-gyp rebuild "
   },
   "repository": {
     "type": "git",
@@ -29,5 +30,8 @@
   "homepage": "https://github.com/crafter999/syncmytime#readme",
   "devDependencies": {
     "@types/node": "^14.14.40"
-  }
+  },
+  "dependencies": {
+  },
+  "gypfile": true
 }

@@ -1,19 +1,22 @@
 #!/usr/bin/env node
 
-import { execute } from "./exec"
 import { getTime } from "./ntp"
+import { setDate } from "../node-gyp"
 
 (async () => {
-    try {
-        let t = await getTime()
-        t = Math.floor(t/1000)
+    let t = await getTime()
+    t = Math.floor(t / 1000)
 
-        if (Number.isNaN(t)) {
-            throw "Invalid number from ntp server"
-        }
-        await execute("/usr/bin/date +%s -s @" + t)
-    } catch (error) {
-        console.error(error);
-        process.exit(1)
+    if (Number.isNaN(t)) {
+        throw "Invalid number from ntp server"
     }
-})()
+    const result = setDate(t)
+    if (result == 0){
+        console.log("OK");
+    } else {
+        console.error("ERROR");
+    }
+})().catch(e => {
+    console.error(e);
+    process.exit(1)
+})
