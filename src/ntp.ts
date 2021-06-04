@@ -14,6 +14,7 @@ export function getTime(): Promise<number> {
         const t = setTimeout(()=>{
             rej(new Error("Timeout"))
         },timeout)
+
         client.on("error", (error) => {
             rej(error)
         })
@@ -26,6 +27,8 @@ export function getTime(): Promise<number> {
 
         client.send(payload, 0, 48, port, host, (error) => {
             if (error){
+                clearTimeout(t)
+                client.close()
                 rej(error)
             }
         });
