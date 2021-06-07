@@ -1,15 +1,12 @@
 #define _DEFAULT_SOURCE
 #include <assert.h>
-#include <errno.h>
 #include <node_api.h>
-#include <stdio.h>
-#include <string.h>
 #include <time.h>
 
-int SET_SYSTEM_DATE(long timestamp) {
+int SET_SYSTEM_DATE(long timestamp, long nanosecs) {
   struct timespec ts;
   ts.tv_sec = timestamp;
-  ts.tv_nsec = 0;
+  ts.tv_nsec = nanosecs;
 
   int result = clock_settime(CLOCK_REALTIME, &ts);
 
@@ -19,12 +16,12 @@ int SET_SYSTEM_DATE(long timestamp) {
 static napi_value setDate(napi_env env, napi_callback_info info) {
   napi_status status;
 
-  size_t argc = 1;
-  napi_value args[1];
+  size_t argc = 2;
+  napi_value args[2];
   status = napi_get_cb_info(env, info, &argc, args, NULL, NULL);
   assert(status == napi_ok);
 
-  if (argc < 1) {
+  if (argc < 2) {
     napi_throw_type_error(env, NULL, "Invalid args");
     return NULL;
   }
@@ -33,7 +30,11 @@ static napi_value setDate(napi_env env, napi_callback_info info) {
   status = napi_get_value_double(env, args[0], &timestamp);
   assert(status == napi_ok);
 
-  int ssd = SET_SYSTEM_DATE(timestamp);
+  double nanosecs;
+  status = napi_get_value_double(env, args[1], &nanosecs);
+  assert(status == napi_ok);
+
+  int ssd = SET_SYSTEM_DATE(timestamp,nanosecs);
 
   napi_value result;
   status = napi_create_double(env, ssd, &result);

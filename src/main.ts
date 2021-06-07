@@ -1,20 +1,40 @@
 #!/usr/bin/env node
 
-import { getTime } from "./ntp"
+import { IResult } from "."
 import { setDate } from "../node-gyp"
+import { getTime } from "./ntp"
+import { fastestPool } from "./pools"
 
 (async () => {
-    let t = await getTime()
-    t = Math.floor(t / 1000)
+    const args = process.argv.slice(2)
+    let t: IResult | undefined
+    if (typeof args[0] !== "undefined" && typeof args[1] !== "undefined") {
+        // manual
+        if (args[0] === "-s") {
+            t = await getTime(args[1],5)
+        }
+    } else {
+        // auto
+        let fastest = await fastestPool()
+        t = await getTime(fastest.host,5)
+    }
 
-    if (Number.isNaN(t)) {
+    // fail-safe (type too)
+    if (!t) {
+        return
+    }
+    if (Number.isNaN(t.timestamp)) {
         throw "Invalid number from ntp server"
     }
-    const result = setDate(t)
-    if (result == 0){
+
+    const timestamp = (t.timestamp + t.diff + t.ms) / 1000
+    const result = setDate(timestamp, t.timestamp % 1000 * 1000)
+    if (result == 0) {
         console.log("OK");
+        process.exit(0)
     } else {
         console.error("ERROR");
+        process.exit(result)
     }
 })().catch(e => {
     console.error(e);
