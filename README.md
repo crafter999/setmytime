@@ -4,13 +4,20 @@ Ultra accurate system date Synchronization using multiple NTP public servers for
 The server part is written in Typescript (Node.js) and the "date setting" part in C using the
 system call `clock_settime`. This project has 0 dependencies.
 
-
 # Install
-```
-npm install -g syncmytime --unsafe
+
+Make sure node-gyp is installed
+```bash
+apt-get install build-essential
+npm install -g node-gyp
 ```
 
-# Run [root]
+Install package as root
+```bash
+npm install -g syncmytime # --unsafe
+```
+
+# Run as root
 
 Unless `-s <host` argument is provided, running just `syncmytime` will fetch & set time from one of the following servers based on lowest latency: 
 ```
@@ -25,3 +32,5 @@ ntp1.hetzner.de
 0.android.pool.ntp.or
 ```
 Setting env `SYNCMYTIMEDEBUG=true` will enable logging.
+
+# Example
