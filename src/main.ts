@@ -2,6 +2,7 @@
 
 import { IResult } from "."
 import { setDate } from "../node-gyp"
+import { logger } from "./logger"
 import { getTime } from "./ntp"
 import { fastestPool } from "./pools"
 
@@ -28,6 +29,7 @@ import { fastestPool } from "./pools"
     }
 
     const timestamp = (t.timestamp + t.diff + t.ms) / 1000
+    logger("set date",timestamp.toString())
     const result = setDate(timestamp, t.timestamp % 1000 * 1000)
     if (result == 0) {
         console.log("OK");
