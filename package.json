@@ -1,6 +1,6 @@
 {
   "name": "syncmytime",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Synchronize system date using NTP public servers. (0 deps)",
   "main": "./src/main.js",
   "bin": {
@@ -29,9 +29,8 @@
   },
   "homepage": "https://github.com/crafter999/syncmytime#readme",
   "devDependencies": {
-    "@types/node": "^14.14.40"
+    "@types/node": "^14.17.3"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "gypfile": true
 }
