@@ -3,14 +3,15 @@ import { logger } from "./logger"
 import { offset } from "./offset"
 import { performance } from "perf_hooks"
 import { IResult } from "."
-import { delay } from "./utils"
+import EventEmitter from "events"
 
 const port = 123
 const timeout = 10000
 const payload = new Uint8Array(48)
 payload[0] = 0x1b
 
-export function getTime(host: string,retries:number): Promise<IResult> {
+export function getTime(host: string, retries: number): Promise<IResult> {
+    const bounce = new EventEmitter()
     let diff = 0
     let sync = 0
     let perf = 0
@@ -30,13 +31,14 @@ export function getTime(host: string,retries:number): Promise<IResult> {
 
         client.on("message", (msg: Uint8Array) => {
             const timestamp = offset(msg)
+            if (timestamp <= 0){
+                return
+            }
             diff = timestamp - diff
             perf = performance.now() - perf
-            if (diff >= 1000){
-                diff = 1000 // safe trap
-            }
-
-            if (sync >= retries) {
+            logger(host, `${timestamp.toFixed(4).toString()} ${perf.toFixed(4)} ${diff}`)
+            
+            if (sync >= retries && sync >= 2) {
                 clearTimeout(t)
                 client.close()
                 res({
@@ -45,13 +47,16 @@ export function getTime(host: string,retries:number): Promise<IResult> {
                     diff: diff,
                     timestamp: timestamp
                 })
+                return
             }
-            logger(host, `${timestamp.toFixed(4).toString()} ${perf.toFixed(4)} ${diff}`)
-            
+
             diff = timestamp
+            sync++
+            bounce.emit("finished")
         })
 
-        while (sync <= retries) {
+        bounce.on("finished", () => {
+            perf = performance.now()
             client.send(payload, 0, 48, port, host, (error) => {
                 if (error) {
                     clearTimeout(t)
@@ -59,9 +64,8 @@ export function getTime(host: string,retries:number): Promise<IResult> {
                     rej(error)
                 }
             })
-            perf = performance.now()
-            await delay(500)
-            sync++
-        }
+        })
+
+        bounce.emit("finished")
     })
 }

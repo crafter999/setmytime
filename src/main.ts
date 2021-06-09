@@ -12,12 +12,12 @@ import { fastestPool } from "./pools"
     if (typeof args[0] !== "undefined" && typeof args[1] !== "undefined") {
         // manual
         if (args[0] === "-s") {
-            t = await getTime(args[1],5)
+            t = await getTime(args[1],4)
         }
     } else {
         // auto
         let fastest = await fastestPool()
-        t = await getTime(fastest.host,5)
+        t = await getTime(fastest.host,4)
     }
 
     // fail-safe (type too)
@@ -28,9 +28,9 @@ import { fastestPool } from "./pools"
         throw "Invalid number from ntp server"
     }
 
-    const timestamp = (t.timestamp + t.diff + t.ms) / 1000
+    const timestamp = (t.timestamp + t.diff + t.ms)
     logger("set date",timestamp.toString())
-    const result = setDate(timestamp, t.timestamp % 1000 * 1000)
+    const result = setDate(timestamp/1000, t.timestamp % 1000 * 1000)
     if (result == 0) {
         console.log("OK");
         process.exit(0)
