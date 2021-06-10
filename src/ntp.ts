@@ -6,7 +6,7 @@ import { IResult } from "."
 import EventEmitter from "events"
 
 const port = 123
-const timeout = 10000
+const timeout = 5000
 const payload = new Uint8Array(48)
 payload[0] = 0x1b
 
@@ -15,16 +15,21 @@ export function getTime(host: string, retries: number): Promise<IResult> {
     let diff = 0
     let sync = 0
     let perf = 0
+    let health = 0
     return new Promise(async (res, rej) => {
         const client = createSocket("udp4")
 
-        const t = setTimeout(() => {
-            client.close()
-            rej(new Error("Timeout"))
-        }, timeout)
+        const t = setInterval(() => {
+            if (health >= timeout){
+                client.close()
+                clearInterval(t)
+                rej(new Error("Timeout"))
+            }
+            health += 1000
+        }, 1000)
 
         client.on("error", (error) => {
-            clearTimeout(t)
+            clearInterval(t)
             client.close()
             rej(error)
         })
@@ -32,14 +37,15 @@ export function getTime(host: string, retries: number): Promise<IResult> {
         client.on("message", (msg: Uint8Array) => {
             const timestamp = offset(msg)
             if (timestamp <= 0){
+                bounce.emit("finished") // skip
                 return
             }
             diff = timestamp - diff
             perf = performance.now() - perf
             logger(host, `${timestamp.toFixed(4).toString()} ${perf.toFixed(4)} ${diff}`)
             
-            if (sync >= retries && sync >= 2) {
-                clearTimeout(t)
+            if (sync >= retries) {
+                clearInterval(t)
                 client.close()
                 res({
                     host: host,
@@ -52,14 +58,15 @@ export function getTime(host: string, retries: number): Promise<IResult> {
 
             diff = timestamp
             sync++
+            health = 0
             bounce.emit("finished")
         })
 
         bounce.on("finished", () => {
-            perf = performance.now()
             client.send(payload, 0, 48, port, host, (error) => {
+                perf = performance.now()
                 if (error) {
-                    clearTimeout(t)
+                    clearInterval(t)
                     client.close()
                     rej(error)
                 }
