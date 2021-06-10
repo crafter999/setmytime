@@ -3,7 +3,7 @@ import { ntpServers } from "./servers";
 import { getTime } from "./ntp";
 import { IResult } from ".";
 
-export async function fastestPool(): Promise<IResult> {
+export async function fastestPools(): Promise<IResult[]> {
     const pools: Promise<IResult>[] = []
     let poolRequests: PromiseSettledResult<IResult>[] = [];
 
@@ -15,7 +15,7 @@ export async function fastestPool(): Promise<IResult> {
     poolRequests = poolRequests.filter(e => e.status === "fulfilled")
 
     const sortedTimestamps = poolRequests.sort((a, b) => {
-        // @ts-ignore
+        // @ts-ignore TODO: fix?
         return a.value.ms - b.value.ms
     })
 
@@ -23,11 +23,8 @@ export async function fastestPool(): Promise<IResult> {
         throw new Error("All pools are down. Maybe network error")
     }
 
-    // @ts-ignore
-    const fastestPool = sortedTimestamps[0].value as IResult
-
-    logger("Found fastest pool server",
-        `${fastestPool.host} ${fastestPool.ms.toFixed(4)}`)
-
-    return fastestPool
+    return sortedTimestamps.map(e=>{
+        // @ts-ignore TODO: fix?
+        return e.value
+    })
 }

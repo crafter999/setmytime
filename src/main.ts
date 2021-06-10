@@ -16,8 +16,15 @@ import { fastestPool } from "./pools"
         }
     } else {
         // auto
-        let fastest = await fastestPool()
-        t = await getTime(fastest.host,4)
+        let fastests = await fastestPools()
+        for (let s of fastests){
+            try {
+                t = await getTime(s.host,4)
+                break
+            } catch (error) {
+                continue
+            }
+        }
     }
 
     // fail-safe (type too)
