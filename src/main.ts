@@ -4,7 +4,8 @@ import { IResult } from "."
 import { setDate } from "../node-gyp"
 import { logger } from "./logger"
 import { getTime } from "./ntp"
-import { fastestPool } from "./pools"
+import { fastestPools } from "./fastestPool"
+import { progressiveSync } from "./progressiveSync"
 
 (async () => {
     const args = process.argv.slice(2)
@@ -38,6 +39,7 @@ import { fastestPool } from "./pools"
     const timestamp = (t.timestamp + t.diff + t.ms)
     logger("set date",timestamp.toString())
     const result = setDate(timestamp/1000, t.timestamp % 1000 * 1000)
+    await progressiveSync()
     if (result == 0) {
         console.log("OK");
         process.exit(0)
@@ -45,6 +47,7 @@ import { fastestPool } from "./pools"
         console.error("ERROR");
         process.exit(result)
     }
+
 })().catch(e => {
     console.error(e);
     process.exit(1)

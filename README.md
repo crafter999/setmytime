@@ -1,6 +1,6 @@
 # syncmytime
 
-Ultra accurate system date Synchronization using multiple NTP public servers for Unix machines. 
+Ultra accurate (0.05s) system date Synchronization using multiple NTP public servers for Unix machines. 
 The server part is written in Typescript (Node.js) and the "date setting" part in C using the
 system call `clock_settime`. This project has 0 dependencies.
 
