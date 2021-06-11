@@ -17,7 +17,8 @@ export async function progressiveSync():Promise<boolean>{
         let timestamp = (t.timestamp + t.diff + t.ms)
         diff = timestamp - diff
 
-        if (diff <= 50 && diff >= -50){
+        logger("diff",`${diff}`)
+        if (diff <= 100 && diff >= -100){
             return true            
         }
 
