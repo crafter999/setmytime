@@ -40,6 +40,15 @@ import { progressiveSync } from "./progressiveSync"
     logger("set date",timestamp.toString())
     const result = setDate(timestamp/1000, t.timestamp % 1000 * 1000)
     await progressiveSync()
+    let maxSyncTries = 0
+    while (await progressiveSync() === false){
+        if (maxSyncTries >= 5){
+            console.warn("Could not sync with accuracy less than 0.01 sec")
+            break
+        }
+        maxSyncTries++
+    }
+
     if (result == 0) {
         console.log("OK");
         process.exit(0)
