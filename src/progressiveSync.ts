@@ -2,10 +2,9 @@ import { IResult } from ".";
 import { setDate } from "../node-gyp";
 import { logger } from "./logger";
 import { getTime } from "./ntp";
-import { ntpServers } from "./servers";
 
-export async function progressiveSync():Promise<boolean>{
-    for (let s of ntpServers){
+export async function progressiveSync(servers:string[]):Promise<boolean>{
+    for (let s of servers){
         let t!:IResult
         try {
             t = await getTime(s,4)

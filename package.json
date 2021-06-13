@@ -1,7 +1,7 @@
 {
   "name": "syncmytime",
-  "version": "0.8.2",
-  "description": "Synchronize system date using NTP public servers. (0 deps)",
+  "version": "0.8.3",
+  "description": "Sync & set the date of any Unix system from NTP public servers",
   "main": "./src/main.js",
   "bin": {
     "syncmytime": "./src/main.js"

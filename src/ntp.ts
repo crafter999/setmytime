@@ -1,4 +1,4 @@
-import { createSocket } from "dgram"
+import { createSocket, Socket } from "dgram"
 import { logger } from "./logger"
 import { offset } from "./offset"
 import { performance } from "perf_hooks"
@@ -6,7 +6,7 @@ import { IResult } from "."
 import EventEmitter from "events"
 
 const port = 123
-const timeout = 5000
+const timeout = 3000
 const payload = new Uint8Array(48)
 payload[0] = 0x1b
 
@@ -76,3 +76,9 @@ export function getTime(host: string, retries: number): Promise<IResult> {
         bounce.emit("finished")
     })
 }
+
+// function safeClose(client:Socket,interval:NodeJS.Timeout){
+//     clearInterval(interval)
+//     if (client.)
+//     client.close()
+// }

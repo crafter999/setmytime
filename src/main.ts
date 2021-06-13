@@ -10,6 +10,7 @@ import { progressiveSync } from "./progressiveSync"
 (async () => {
     const args = process.argv.slice(2)
     let t: IResult | undefined
+    let fastestSorted = await fastestPools()
     if (typeof args[0] !== "undefined" && typeof args[1] !== "undefined") {
         // manual
         if (args[0] === "-s") {
@@ -17,8 +18,7 @@ import { progressiveSync } from "./progressiveSync"
         }
     } else {
         // auto
-        let fastests = await fastestPools()
-        for (let s of fastests){
+        for (let s of fastestSorted){
             try {
                 t = await getTime(s.host,4)
                 break
@@ -39,9 +39,10 @@ import { progressiveSync } from "./progressiveSync"
     const timestamp = (t.timestamp + t.diff + t.ms)
     logger("set date",timestamp.toString())
     const result = setDate(timestamp/1000, t.timestamp % 1000 * 1000)
-    await progressiveSync()
+    
     let maxSyncTries = 0
-    while (await progressiveSync() === false){
+    let firstFastest = fastestSorted.map(e=>e.host)
+    while (await progressiveSync(firstFastest) === false){
         if (maxSyncTries >= 5){
             console.warn("Could not sync with accuracy less than 0.01 sec")
             break

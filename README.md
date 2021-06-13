@@ -1,6 +1,9 @@
 # syncmytime
 
-Ultra accurate (0.01s) system date Synchronization using multiple NTP public servers for Unix machines. 
+This package will sync and **set** the date of any Unix system. 
+
+# Few words
+Ultra accurate (0.01s) system date synchronization from multiple NTP public servers.
 The server part is written in Typescript (Node.js) and the "date setting" part in C using the
 system call `clock_settime`. This project has 0 dependencies.
 
@@ -19,7 +22,7 @@ npm install -g syncmytime # --unsafe
 
 # Run as root
 
-Unless `-s <host` argument is provided, running just `syncmytime` will fetch & set time from one of the following servers based on lowest latency: 
+Unless `-s <host` argument is provided, running just `syncmytime` will fetch & **set** time from one of the following servers based on lowest latency: 
 ```
 pool.ntp.org
 europe.pool.ntp.org
